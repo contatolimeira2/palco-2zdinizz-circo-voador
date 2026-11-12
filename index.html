@@ -261,8 +261,8 @@ box(11.62, .07, .1, new THREE.MeshStandardMaterial({ color: 0x5a2f1b, roughness:
 [-1, 1].forEach(s => box(.3, 5.2, 1.4, M.black, s * 5.25, DECK + 2.6, -5.4));
 // asas laterais do PA
 [-1, 1].forEach(s => box(2.0, DECK, 2.2, M.black, s * 6.75, DECK / 2, -1.0));
-// área fora do palco (direita de quem olha) — console
-box(2.2, DECK, 2.6, M.black, 6.5, DECK / 2, -3.6);
+// área fora do palco (esquerda de quem olha) — console
+box(2.2, DECK, 2.6, M.black, -6.5, DECK / 2, -3.6);
 
 // ---------- estrutura superior (cúpula, treliças, luzes) ----------
 const overhead = new THREE.Group(); scene.add(overhead);
@@ -466,7 +466,7 @@ const xdjTop = canvasTex(1024, 640, (c, w, h) => {
   c.fillStyle = '#2b2b2b'; c.beginPath(); c.arc(70, 600, 26, 0, PI * 2); c.arc(954, 600, 26, 0, PI * 2); c.fill();
   c.fillStyle = '#9a9a9a'; c.font = '700 22px Arial'; c.fillText('XDJ-RX3', 456, 625);
 });
-const xdj = new THREE.Group(); xdj.position.set(0, DECK + .9, rz - .05); scene.add(xdj);
+const xdj = new THREE.Group(); xdj.position.set(-.5, DECK + .9, rz - .05); scene.add(xdj);
 {
   const body = rbox(.73, .07, .45, .015, M.plasticBlack, 0, .045, 0, xdj);
   const top = mesh(new THREE.PlaneGeometry(.72, .44), new THREE.MeshStandardMaterial({ map: xdjTop, roughness: .45, metalness: .3 }), 0, .081, 0, xdj, false); top.rotation.x = -PI / 2;
@@ -475,7 +475,22 @@ const xdj = new THREE.Group(); xdj.position.set(0, DECK + .9, rz - .05); scene.a
   box(.27, .17, .02, M.plasticBlack, 0, .135, -.168, xdj).rotation.x = -.55;
   [-.235, .235].forEach(x => { const j = cyl(.072, .072, .012, M.alu, x, .088, .07, xdj, 40); const c2 = cyl(.05, .05, .014, M.plasticBlack, x, .089, .07, xdj, 32); });
 }
-label('XDJ-RX3', .85, DECK + 1.25, rz + .1, { size: .22 });
+label('XDJ-RX3', -.7, DECK + 1.18, rz + .35, { size: .22 });
+// --- DJ 02: equipamento próprio (laptop + controladora) ---
+{
+  const g = new THREE.Group(); g.position.set(.5, DECK + .9, rz - .05); scene.add(g);
+  rbox(.6, .05, .32, .012, M.plasticBlack, 0, .03, .06, g);
+  const ctl = canvasTex(512, 256, (c, w, h) => { c.fillStyle = '#141414'; c.fillRect(0, 0, w, h); [[110, 140], [400, 140]].forEach(([x, y]) => { c.fillStyle = '#2b2b2b'; c.beginPath(); c.arc(x, y, 80, 0, PI * 2); c.fill(); c.strokeStyle = '#777'; c.lineWidth = 4; c.stroke(); }); for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#3fa9ff' : '#ff2a3a'; c.fillRect(200 + (i % 4) * 28, 40 + Math.floor(i / 4) * 30, 22, 22); } c.fillStyle = '#ccc'; c.fillRect(246, 200, 20, 10); });
+  const tp = mesh(new THREE.PlaneGeometry(.58, .3), new THREE.MeshStandardMaterial({ map: ctl, roughness: .5 }), 0, .056, .06, g, false); tp.rotation.x = -PI / 2;
+  // suporte + laptop
+  box(.28, .1, .22, M.alu, 0, .05, -.17, g);
+  box(.34, .012, .23, new THREE.MeshStandardMaterial({ color: 0xb8b8bc, roughness: .3, metalness: .8 }), 0, .106, -.17, g);
+  const lid = new THREE.Group(); lid.position.set(0, .112, -.28); lid.rotation.x = -.25; g.add(lid);
+  box(.34, .22, .01, new THREE.MeshStandardMaterial({ color: 0xb8b8bc, roughness: .3, metalness: .8 }), 0, .11, 0, lid);
+  const lt = canvasTex(512, 320, (c, w, h) => { c.fillStyle = '#0a0d14'; c.fillRect(0, 0, w, h); for (let k = 0; k < 2; k++) { c.fillStyle = k ? '#ff6b2a' : '#3fb6ff'; for (let x = 0; x < w; x += 3) { const a = 20 + Math.abs(Math.sin(x * .05 + k)) * 40 * Math.random(); c.fillRect(x, 70 + k * 120 - a / 2, 2, a); } } });
+  mesh(new THREE.PlaneGeometry(.32, .2), new THREE.MeshStandardMaterial({ color: 0, emissive: 0xffffff, emissiveMap: lt, emissiveIntensity: 1 }), 0, .11, .006, lid, false);
+}
+label('EQUIPAMENTO PRÓPRIO', .75, DECK + 1.46, rz + .35, { size: .22 });
 
 // --- monitores (wedges) ---
 function wedge(x, z, rotY, name, brand = 'EAW') {
@@ -617,9 +632,12 @@ function amp(x, z) {
 
 // ================================================================== ELENCO
 // DJ: atrás do praticável (no chão do palco)
-const dj = human({ x: 0, z: rz - .78, shirt: 0x0d0d0d, pants: 0x101010, shoes: 0xcfcfcf, skin: skinTones[2], cap: 0x0d0d0d, longSleeve: false,
+human({ x: -.5, z: rz - .78, shirt: 0x0d0d0d, pants: 0x101010, shoes: 0xcfcfcf, skin: skinTones[2], cap: 0x0d0d0d, longSleeve: false,
   pose: { R: { x: -.85, z: -.12, ex: -.55 }, L: { x: -.85, z: .12, ex: -.55 }, head: [.25, 0] } });
-label('DJ', 0, DECK + 2.1, rz - .78, { accent: true });
+label('DJ 01', -.5, DECK + 2.1, rz - .78, { accent: true });
+human({ x: .5, z: rz - .78, shirt: 0x2a2a2a, pants: 0x1d2a3d, shoes: 0x111111, skin: skinTones[3], longSleeve: false,
+  pose: { R: { x: -.85, z: -.12, ex: -.55 }, L: { x: -.85, z: .12, ex: -.55 }, head: [.25, 0] } });
+label('DJ 02', .5, DECK + 2.1, rz - .78, { accent: true });
 
 // sax + teclado (mesma posição)
 const kx = -2.4, kz = Z(2.35);
@@ -657,9 +675,9 @@ label('GUITARRA', -4.7, DECK + 2.15, Z(2.45), { accent: true });
 });
 label('PEDESTAL + MIC S/ FIO', 3.27, DECK + .45, Z(2.4) + .9, { size: .2 });
 
-// ================================================================== CONSOLE MONITOR (fora do palco, direita de quem olha)
+// ================================================================== CONSOLE MONITOR (fora do palco, esquerda de quem olha)
 {
-  const g = new THREE.Group(); g.position.set(6.45, DECK, -3.6); g.rotation.y = -PI / 2 + .3; scene.add(g);
+  const g = new THREE.Group(); g.position.set(-6.45, DECK, -3.6); g.rotation.y = PI / 2 - .3; scene.add(g);
   // case/mesa
   rbox(1.45, .78, .9, .02, M.tolex, 0, .39, 0, g);
   [-1, 1].forEach(s => [-1, 1].forEach(t => box(.04, .78, .04, M.alu, s * .72, .39, t * .44, g)));
@@ -675,7 +693,7 @@ label('PEDESTAL + MIC S/ FIO', 3.27, DECK + .45, Z(2.4) + .9, { size: .2 });
   const scTex = canvasTex(512, 256, (c, w, h) => { c.fillStyle = '#0b1420'; c.fillRect(0, 0, w, h); for (let i = 0; i < 16; i++) { c.fillStyle = '#1d2c40'; c.fillRect(10 + i * 31, 20, 24, 200); const lv = 40 + Math.random() * 150; c.fillStyle = lv > 170 ? '#ff3b3b' : '#46e07a'; c.fillRect(14 + i * 31, 220 - lv, 16, lv); } });
   const sc = mesh(new THREE.PlaneGeometry(.42, .22), new THREE.MeshStandardMaterial({ color: 0, emissive: 0xffffff, emissiveMap: scTex, emissiveIntensity: 1 }), 0, .26, -.27, cs, false); sc.rotation.x = -.35;
   box(.46, .26, .03, M.plasticBlack, 0, .255, -.29, cs).rotation.x = -.35;
-  label('CONSOLE MONITOR\nPRÓPRIA 2ZDINIZZ', 6.6, DECK + 2.45, -3.6, { accent: true, size: .3 });
+  label('CONSOLE MONITOR\nPRÓPRIA 2ZDINIZZ', -6.6, DECK + 2.45, -3.6, { accent: true, size: .3 });
 }
 
 // ================================================================== LUZ
